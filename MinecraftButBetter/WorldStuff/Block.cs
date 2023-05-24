@@ -14,6 +14,7 @@ namespace MinecraftButBetter.WorldStuff
         private BlockType type;
         private int myIndex = 0;
 
+        public double distSq;
         public Block(int x, int y, int z)
         {
             this.x = x;
@@ -45,6 +46,7 @@ namespace MinecraftButBetter.WorldStuff
     {
         public FaceIndex side;
         int[,] edges;
+        int[] corners;
         Color color;
         double distSquared;
         public BlockType parentBlockType;
@@ -54,11 +56,16 @@ namespace MinecraftButBetter.WorldStuff
             side = _side;
             parentBlockType = _parentBlockType;
             edges = sideToEdges(side);
+            corners = sideToCorners(side);
         }
 
         public int[,] getEdges()
         {
             return edges;
+        }
+        public int[] getCorners()
+        {
+            return corners;
         }
         private int[,] sideToEdges(FaceIndex s)
         {
@@ -116,6 +123,46 @@ namespace MinecraftButBetter.WorldStuff
 
             }
             return lines;
+        }
+
+        private int[] sideToCorners(FaceIndex s)
+        {
+            int[] corners = new int[4];
+            switch (s)
+            {
+                case FaceIndex.TOP:
+                    corners = new int[]{
+                        3,2,6,7
+                    };
+                    break;
+                case FaceIndex.BOTTOM:
+                    corners = new int[]{
+                        1,0,4,5
+                    }; 
+                    break;
+                case FaceIndex.LEFT:
+                    corners = new int[]{
+                        3,1,5,7
+                    };
+                    break;
+                case FaceIndex.RIGHT:
+                    corners = new int[]{
+                        2,0,4,6
+                    };
+                    break;
+                case FaceIndex.FRONT:
+                    corners = new int[]{
+                        5,4,6,7
+                    };
+                    break;
+                case FaceIndex.BACK:
+                    corners = new int[]{
+                        1,0,2,3
+                    };
+                    break;
+
+            }
+            return corners;
         }
     }
 

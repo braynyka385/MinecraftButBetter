@@ -23,19 +23,19 @@ namespace MinecraftButBetter.Screens
         {
             InitializeComponent();
             camera = new Camera(-3, 2, 4, 0, 90, 90, 0, 0);
-            //for (int x = 0; x < 10; x++)
-            //{
-            //    for (int z = 0; z < 10; z++)
-            //    {
-            //        Block b = new Block(x, 0, z);
+            for (int x = 0; x < 20; x++)
+            {
+                for (int z = 0; z < 20; z++)
+                {
+                    Block b = new Block(x, Random.Shared.Next(-1,1), z);
 
-            //        blocks.Add(b);
+                    blocks.Add(b);
 
-            //    }
-            //}
+                }
+            }
 
-            Block b = new Block(0, 0, 0);
-            blocks.Add(b);
+            //Block b = new Block(0, 0, 0);
+            //blocks.Add(b);
 
             pointD3s.Add(new PointD3(0, 0, 0));
             pointD3s.Add(new PointD3(1, 0, 0));
@@ -46,6 +46,8 @@ namespace MinecraftButBetter.Screens
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
             SolidBrush black = new SolidBrush(Color.Black);
+            SolidBrush green = new SolidBrush(Color.Green);
+            SolidBrush brown = new SolidBrush(Color.SaddleBrown);
             Pen blackPen = new Pen(Color.Black);
             foreach (Block b in blocks)
             {
@@ -54,16 +56,61 @@ namespace MinecraftButBetter.Screens
                 {
                     PointF p = camera.pointToScreen(b.points[i]);
                     pointsFs[i] = p;
-                    Rectangle r = new Rectangle(multiplierToCoords(p), new Size(5, 5));
+                    Rectangle r = new Rectangle(multiplierToCoords(p), new Size(1, 1));
                     e.Graphics.FillEllipse(black, r);
                 }
 
-                int[,] edges = b.getFace(FaceIndex.BACK).getEdges();
-
-                for(int i = 0; i < 4; i++)
+                int[,] edges = new int[4,2];
+                int[] corners = new int[4];
+                for(int j = 5; j >= 0; j--)
                 {
-                    e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[edges[i,0]]), multiplierToCoords(pointsFs[edges[i, 1]]));
+                    edges = b.getFace((FaceIndex)j).getEdges();
+                    corners = b.getFace((FaceIndex)j).getCorners();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        PointF start = pointsFs[edges[i, 0]];
+                        PointF end = pointsFs[edges[i, 1]];
+                        if(start.X > 0 && end.X > 0)
+                        {
+                            //e.Graphics.DrawLine(blackPen, multiplierToCoords(start), multiplierToCoords(end));
+                            
+                        }
+
+                        
+                    }
+                    if ((FaceIndex)j == FaceIndex.TOP)
+                    {
+                        Point[] converted =
+                        {
+                           multiplierToCoords(pointsFs[corners[0]]),
+                           multiplierToCoords(pointsFs[corners[1]]),
+                           multiplierToCoords(pointsFs[corners[2]]),
+                           multiplierToCoords(pointsFs[corners[3]])
+
+                        };
+                        //if (converted[0].X > 0 && converted[1].X > 0 && converted[2].X > 0 && converted[3].X > 0)
+                        if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
+                            e.Graphics.FillPolygon(green,converted);
+                    }
+                    else if ((FaceIndex)j == FaceIndex.BACK || (FaceIndex)j == FaceIndex.FRONT || (FaceIndex)j == FaceIndex.LEFT || (FaceIndex)j == FaceIndex.RIGHT)
+                    {
+                        Point[] converted =
+                        {
+                           multiplierToCoords(pointsFs[corners[0]]),
+                           multiplierToCoords(pointsFs[corners[1]]),
+                           multiplierToCoords(pointsFs[corners[2]]),
+                           multiplierToCoords(pointsFs[corners[3]])
+                           
+                        };
+                        Color sb = Color.SaddleBrown;
+                        Color c = Color.FromArgb(sb.R + Random.Shared.Next(0, 100), sb.G + Random.Shared.Next(0, 100), sb.B + Random.Shared.Next(0, 100));
+                        brown.Color = c;
+                        if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
+                        //if (converted[0].X > 0 && converted[1].X > 0 && converted[2].X > 0 && converted[3].X > 0)
+                            e.Graphics.FillPolygon(brown, converted);
+                    }
                 }
+                
                 #region 
                 //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[1]));
                 //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[2]));
@@ -99,8 +146,6 @@ namespace MinecraftButBetter.Screens
 
 
             }
-
-
         }
         private Point multiplierToCoords(PointF m)
         {
@@ -160,16 +205,26 @@ namespace MinecraftButBetter.Screens
         }
         private void gameTimer_Tick(object sender, EventArgs e)
         {
-            double z = (pressedKeys[0] == true ? 1d * (gameTimer.Interval / 1000d) : 0)
-                - (pressedKeys[1] == true ? 1d * (gameTimer.Interval / 1000d) : 0);
-
-            double x = (pressedKeys[2] == true ? 1d * (gameTimer.Interval / 1000d) : 0)
-                - (pressedKeys[3] == true ? 1d * (gameTimer.Interval / 1000d) : 0);
-            double y = (pressedKeys[4] == true ? 1d * (gameTimer.Interval / 1000d) : 0)
-                - (pressedKeys[5] == true ? 1d * (gameTimer.Interval / 1000d) : 0);
+            double movementScale = 2;
+            double z = (pressedKeys[0] == true ? movementScale * (gameTimer.Interval / 1000d) : 0)
+                - (pressedKeys[1] == true ? movementScale * (gameTimer.Interval / 1000d) : 0);
+            double x = (pressedKeys[2] == true ? movementScale * (gameTimer.Interval / 1000d) : 0)
+                - (pressedKeys[3] == true ? movementScale * (gameTimer.Interval / 1000d) : 0);
+            double y = (pressedKeys[4] == true ? movementScale * (gameTimer.Interval / 1000d) : 0)
+                - (pressedKeys[5] == true ? movementScale * (gameTimer.Interval / 1000d) : 0);
 
             camera.move(new PointD3(x, y, z));
 
+
+            foreach (Block b in blocks)
+            {
+                double xFactor = b.points[0].X - camera.pos().X;
+                double yFactor = b.points[0].Y - camera.pos().Y;
+                double zFactor = b.points[0].Z - camera.pos().Z;
+                b.distSq = (xFactor*xFactor) + (yFactor*yFactor) + (zFactor * zFactor);
+            }
+
+            blocks = blocks.OrderByDescending(b => b.distSq).ToList();
             Refresh();
         }
 

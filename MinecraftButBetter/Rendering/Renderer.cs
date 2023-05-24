@@ -34,6 +34,10 @@ namespace MinecraftButBetter.Rendering
             rotatedBy.Y = by.Y;
             loc.add(rotatedBy);
         }
+        public PointD3 pos()
+        {
+            return loc;
+        }
         public void rotate(int toX, int toY, int w, int h)
         {
             double cHXSP = map(headingX, 0, 360, 0, w);
@@ -57,6 +61,7 @@ namespace MinecraftButBetter.Rendering
             double YOffset = (Math.Cos(headingYRad) * delta.Y) + (Math.Sin(headingYRad) * XZDistFromCam);
 
             XZDistFromCam -= (Math.Sin(headingYRad) * delta.Y); //Comment out if there's some weirdness with the size of blocks depending on y-axis
+            //TODO: Figure out why Y headings approaching 90 cause distortion
             double x = -1;
             double y = -1;
  
@@ -64,7 +69,7 @@ namespace MinecraftButBetter.Rendering
             y = map(YOffset, 0, YDistFromCam, 0.5, 1);
 
             // y = 0;
-            if (x > 1 || y > 1 || x < 0|| y < 0 || YDistFromCam < 0)
+            if (x > 2 || y > 2 || x < -1|| y < -1 || YDistFromCam < 0)
             {
                 return new PointF(-1, -1);
             }
