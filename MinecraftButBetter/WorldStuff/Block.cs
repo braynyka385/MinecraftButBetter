@@ -13,6 +13,7 @@ namespace MinecraftButBetter.WorldStuff
         public PointD3[] points = new PointD3[8];
         private BlockType type;
         private int myIndex = 0;
+        private Face[] faces;
 
         public double distSq;
         public Block(int x, int y, int z)
@@ -28,8 +29,18 @@ namespace MinecraftButBetter.WorldStuff
             points[5] = (new PointD3(1 + x, y, 1 + z));
             points[6] = (new PointD3(x, 1 + y, 1 + z));
             points[7] = (new PointD3(1 + x, 1 + y, 1 + z));
+
+            faces = new Face[6];
+            for(int i = 0; i < 6; i++)
+            {
+                faces[i] = new Face((FaceIndex)i, type, new int[] {x,y,z});
+            }
         }
 
+        public void setVisibility(Face f, bool val)
+        {
+            faces[(int)f.side].isVisible = val;
+        }
         public PointD3 doublePos ()
         {
             return new PointD3 (x, y, z);
@@ -37,28 +48,82 @@ namespace MinecraftButBetter.WorldStuff
 
         public Face getFace(FaceIndex side)
         {
-            return new Face(side, this.type);
+            //return new Face(side, this.type);
+            return faces[(int)side];
         }
         
     }
 
     class Face
     {
+        public bool isVisible = true;
         public FaceIndex side;
+        private FaceIndex opposingFace;
         int[,] edges;
         int[] corners;
         Color color;
         double distSquared;
         public BlockType parentBlockType;
+       // int[] parentLoc;
+        public int[] locOfImpedingBlock;
 
-        public Face(FaceIndex _side, BlockType _parentBlockType)
+        public Face(FaceIndex _side, BlockType _parentBlockType, int[]pos)
         {
             side = _side;
             parentBlockType = _parentBlockType;
             edges = sideToEdges(side);
             corners = sideToCorners(side);
+            opposingFace = getOpposingFace();
+            locOfImpedingBlock = locationOfImpedingBlock(pos);
+
+
         }
 
+        private int[] locationOfImpedingBlock(int[] parentLoc)
+        {
+            int[] loc = parentLoc;
+            switch (side)
+            {
+                case FaceIndex.TOP:
+                    loc[1]++;
+                    break;
+                case FaceIndex.BOTTOM:
+                    loc[1]--;
+                    break;
+                case FaceIndex.LEFT:
+                    loc[0]++;
+                    break;
+                case FaceIndex.RIGHT:
+                    loc[0]--;
+                    break;
+                case FaceIndex.FRONT:
+                    loc[2]++;
+                    break;
+                case FaceIndex.BACK:
+                    loc[2]--; //0123
+                    break;
+            }
+           return loc;
+        }
+        private FaceIndex getOpposingFace()
+        {
+            switch(side)
+            {
+                case FaceIndex.TOP:
+                    return FaceIndex.BOTTOM;
+                case FaceIndex.BOTTOM:
+                    return FaceIndex.TOP;
+                case FaceIndex.LEFT:
+                    return FaceIndex.RIGHT;
+                case FaceIndex.RIGHT:
+                    return FaceIndex.LEFT;
+                case FaceIndex.FRONT:
+                    return FaceIndex.BACK;
+                case FaceIndex.BACK:
+                    return FaceIndex.FRONT;
+            }
+            return FaceIndex.TOP;
+        }
         public int[,] getEdges()
         {
             return edges;

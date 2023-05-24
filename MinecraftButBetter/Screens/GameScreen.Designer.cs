@@ -35,7 +35,7 @@
             // 
             // gameTimer
             // 
-            gameTimer.Interval = 50;
+            gameTimer.Interval = 20;
             gameTimer.Tick += gameTimer_Tick;
             // 
             // label1

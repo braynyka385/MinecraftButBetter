@@ -23,14 +23,35 @@ namespace MinecraftButBetter.Screens
         {
             InitializeComponent();
             camera = new Camera(-3, 2, 4, 0, 90, 90, 0, 0);
-            for (int x = 0; x < 20; x++)
+            for (int x = 0; x < 25; x++)
             {
-                for (int z = 0; z < 20; z++)
+                for (int y = 0; y < 10; y++)
                 {
-                    Block b = new Block(x, Random.Shared.Next(-1,1), z);
+                    for (int z = 0; z < 25; z++)
+                    {
+                        Block b = new Block(x, Random.Shared.Next(-25, 25), z);
 
-                    blocks.Add(b);
+                        blocks.Add(b);
 
+                    }
+                }
+
+            }
+
+            foreach (Block b in blocks)
+            {
+                for(int i = 0; i < 6; i++)
+                {
+                    Face f = b.getFace((FaceIndex)i);
+
+                    foreach (Block b2 in blocks)
+                    {
+                        PointD3 p = new PointD3(f.locOfImpedingBlock);
+                        if (b2.points[0].equals(p))
+                        {
+                            b.setVisibility(f, false);
+                        }
+                    }
                 }
             }
 
@@ -60,57 +81,63 @@ namespace MinecraftButBetter.Screens
                     e.Graphics.FillEllipse(black, r);
                 }
 
-                int[,] edges = new int[4,2];
+                int[,] edges = new int[4, 2];
                 int[] corners = new int[4];
-                for(int j = 5; j >= 0; j--)
+                for (int j = 5; j >= 0; j--)
                 {
-                    edges = b.getFace((FaceIndex)j).getEdges();
-                    corners = b.getFace((FaceIndex)j).getCorners();
-                    for (int i = 0; i < 4; i++)
+                    Face f = b.getFace((FaceIndex)j);
+                    if(f.isVisible)
                     {
-                        PointF start = pointsFs[edges[i, 0]];
-                        PointF end = pointsFs[edges[i, 1]];
-                        if(start.X > 0 && end.X > 0)
+                        edges = f.getEdges();
+                        corners = f.getCorners();
+                        for (int i = 0; i < 4; i++)
                         {
-                            //e.Graphics.DrawLine(blackPen, multiplierToCoords(start), multiplierToCoords(end));
-                            
+                            PointF start = pointsFs[edges[i, 0]];
+                            PointF end = pointsFs[edges[i, 1]];
+                            if (start.X > 0 && end.X > 0)
+                            {
+                                //e.Graphics.DrawLine(blackPen, multiplierToCoords(start), multiplierToCoords(end));
+
+                            }
+
+
                         }
-
-                        
-                    }
-                    if ((FaceIndex)j == FaceIndex.TOP)
-                    {
-                        Point[] converted =
+                        if ((FaceIndex)j == FaceIndex.TOP)
                         {
+                            Point[] converted =
+                            {
                            multiplierToCoords(pointsFs[corners[0]]),
                            multiplierToCoords(pointsFs[corners[1]]),
                            multiplierToCoords(pointsFs[corners[2]]),
                            multiplierToCoords(pointsFs[corners[3]])
 
                         };
-                        //if (converted[0].X > 0 && converted[1].X > 0 && converted[2].X > 0 && converted[3].X > 0)
-                        if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
-                            e.Graphics.FillPolygon(green,converted);
-                    }
-                    else if ((FaceIndex)j == FaceIndex.BACK || (FaceIndex)j == FaceIndex.FRONT || (FaceIndex)j == FaceIndex.LEFT || (FaceIndex)j == FaceIndex.RIGHT)
-                    {
-                        Point[] converted =
+                            //if (converted[0].X > 0 && converted[1].X > 0 && converted[2].X > 0 && converted[3].X > 0)
+                            if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
+                                e.Graphics.FillPolygon(green, converted);
+                        }
+                        else if ((FaceIndex)j == FaceIndex.BACK || (FaceIndex)j == FaceIndex.FRONT || (FaceIndex)j == FaceIndex.LEFT || (FaceIndex)j == FaceIndex.RIGHT)
                         {
+                            Point[] converted =
+                            {
                            multiplierToCoords(pointsFs[corners[0]]),
                            multiplierToCoords(pointsFs[corners[1]]),
                            multiplierToCoords(pointsFs[corners[2]]),
                            multiplierToCoords(pointsFs[corners[3]])
-                           
+
                         };
-                        Color sb = Color.SaddleBrown;
-                        Color c = Color.FromArgb(sb.R + Random.Shared.Next(0, 100), sb.G + Random.Shared.Next(0, 100), sb.B + Random.Shared.Next(0, 100));
-                        brown.Color = c;
-                        if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
-                        //if (converted[0].X > 0 && converted[1].X > 0 && converted[2].X > 0 && converted[3].X > 0)
-                            e.Graphics.FillPolygon(brown, converted);
+                            Color sb = Color.SaddleBrown;
+                            Color c = Color.FromArgb(sb.R + Random.Shared.Next(0, 100), sb.G + Random.Shared.Next(0, 100), sb.B + Random.Shared.Next(0, 100)); // LOL party mode
+                            brown.Color = sb;
+                            if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
+                                //if (converted[0].X > 0 && converted[1].X > 0 && converted[2].X > 0 && converted[3].X > 0)
+                                e.Graphics.FillPolygon(brown, converted);
+                        }
                     }
+
+                    
                 }
-                
+
                 #region 
                 //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[1]));
                 //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[2]));
@@ -221,7 +248,7 @@ namespace MinecraftButBetter.Screens
                 double xFactor = b.points[0].X - camera.pos().X;
                 double yFactor = b.points[0].Y - camera.pos().Y;
                 double zFactor = b.points[0].Z - camera.pos().Z;
-                b.distSq = (xFactor*xFactor) + (yFactor*yFactor) + (zFactor * zFactor);
+                b.distSq = (xFactor * xFactor) + (yFactor * yFactor) + (zFactor * zFactor);
             }
 
             blocks = blocks.OrderByDescending(b => b.distSq).ToList();

@@ -15,6 +15,12 @@ namespace MinecraftButBetter.Datatypes
             Y = y;
             Z = z;
         }
+        public PointD3(int[] pos)
+        {
+            X = pos[0];
+            Y = pos[1];
+            Z = pos[2];
+        }
 
         public void add(PointD3 point)
         {
@@ -39,6 +45,11 @@ namespace MinecraftButBetter.Datatypes
             X /= point.X;
             Y /= point.Y;
             Z /= point.Z;
+        }
+        public bool equals(PointD3 point)
+        {
+            if(point.X == X && point.Y ==  Y && point.Z == Z) return true;
+            return false;
         }
         public PointD3 delta(PointD3 other)
         {
