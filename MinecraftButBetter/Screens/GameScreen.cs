@@ -10,26 +10,41 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MinecraftButBetter.Datatypes;
 using MinecraftButBetter.WorldStuff;
+using MinecraftButBetter.WorldStuff.Blocks;
 
 namespace MinecraftButBetter.Screens
 {
     public partial class GameScreen : UserControl
     {
+        Random random;
         Camera camera;
         List<PointD3> pointD3s = new List<PointD3>();
         List<Block> blocks = new List<Block>();
         bool[] pressedKeys = new bool[6];
+        Ray ray;
         public GameScreen()
         {
+            random = new Random();
             InitializeComponent();
             camera = new Camera(-3, 2, 4, 0, 90, 90, 0, 0);
-            for (int x = 0; x < 25; x++)
+            for (int x = 0; x < 50; x++)
             {
-                for (int y = 0; y < 10; y++)
+                for (int y = 0; y < 1; y++)
                 {
-                    for (int z = 0; z < 25; z++)
+                    for (int z = 0; z < 50; z++)
                     {
-                        Block b = new Block(x, Random.Shared.Next(-25, 25), z);
+                        int yy = random.Next(-1, 1);
+                        Block b;
+                        if (yy < 0)
+                        {
+                            b = new BlockStone(x, yy, z);
+
+                        }
+                        else
+                        {
+                            b = new BlockGrass(x, yy, z);
+
+                        }
 
                         blocks.Add(b);
 
@@ -40,7 +55,7 @@ namespace MinecraftButBetter.Screens
 
             foreach (Block b in blocks)
             {
-                for(int i = 0; i < 6; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     Face f = b.getFace((FaceIndex)i);
 
@@ -55,8 +70,7 @@ namespace MinecraftButBetter.Screens
                 }
             }
 
-            //Block b = new Block(0, 0, 0);
-            //blocks.Add(b);
+
 
             pointD3s.Add(new PointD3(0, 0, 0));
             pointD3s.Add(new PointD3(1, 0, 0));
@@ -66,10 +80,8 @@ namespace MinecraftButBetter.Screens
 
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
-            SolidBrush black = new SolidBrush(Color.Black);
-            SolidBrush green = new SolidBrush(Color.Green);
-            SolidBrush brown = new SolidBrush(Color.SaddleBrown);
-            Pen blackPen = new Pen(Color.Black);
+            SolidBrush blackBrush = new SolidBrush(Color.Black);
+
             foreach (Block b in blocks)
             {
                 PointF[] pointsFs = new PointF[8];
@@ -77,65 +89,31 @@ namespace MinecraftButBetter.Screens
                 {
                     PointF p = camera.pointToScreen(b.points[i]);
                     pointsFs[i] = p;
-                    Rectangle r = new Rectangle(multiplierToCoords(p), new Size(1, 1));
-                    e.Graphics.FillEllipse(black, r);
                 }
 
-                int[,] edges = new int[4, 2];
                 int[] corners = new int[4];
+                b.selfObstructFaces(camera.pos());
                 for (int j = 5; j >= 0; j--)
                 {
                     Face f = b.getFace((FaceIndex)j);
-                    if(f.isVisible)
+                    if (f.isVisible && !f.obstructedByOwnBlock)
                     {
-                        edges = f.getEdges();
                         corners = f.getCorners();
-                        for (int i = 0; i < 4; i++)
+
+                        Point[] converted =
                         {
-                            PointF start = pointsFs[edges[i, 0]];
-                            PointF end = pointsFs[edges[i, 1]];
-                            if (start.X > 0 && end.X > 0)
-                            {
-                                //e.Graphics.DrawLine(blackPen, multiplierToCoords(start), multiplierToCoords(end));
-
-                            }
-
-
-                        }
-                        if ((FaceIndex)j == FaceIndex.TOP)
-                        {
-                            Point[] converted =
-                            {
                            multiplierToCoords(pointsFs[corners[0]]),
                            multiplierToCoords(pointsFs[corners[1]]),
                            multiplierToCoords(pointsFs[corners[2]]),
                            multiplierToCoords(pointsFs[corners[3]])
 
                         };
-                            //if (converted[0].X > 0 && converted[1].X > 0 && converted[2].X > 0 && converted[3].X > 0)
-                            if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
-                                e.Graphics.FillPolygon(green, converted);
-                        }
-                        else if ((FaceIndex)j == FaceIndex.BACK || (FaceIndex)j == FaceIndex.FRONT || (FaceIndex)j == FaceIndex.LEFT || (FaceIndex)j == FaceIndex.RIGHT)
-                        {
-                            Point[] converted =
-                            {
-                           multiplierToCoords(pointsFs[corners[0]]),
-                           multiplierToCoords(pointsFs[corners[1]]),
-                           multiplierToCoords(pointsFs[corners[2]]),
-                           multiplierToCoords(pointsFs[corners[3]])
 
-                        };
-                            Color sb = Color.SaddleBrown;
-                            Color c = Color.FromArgb(sb.R + Random.Shared.Next(0, 100), sb.G + Random.Shared.Next(0, 100), sb.B + Random.Shared.Next(0, 100)); // LOL party mode
-                            brown.Color = sb;
-                            if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
-                                //if (converted[0].X > 0 && converted[1].X > 0 && converted[2].X > 0 && converted[3].X > 0)
-                                e.Graphics.FillPolygon(brown, converted);
-                        }
+                        if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
+                            e.Graphics.FillPolygon(b.faceBrush[j], converted);
                     }
 
-                    
+
                 }
 
                 #region 
@@ -172,6 +150,20 @@ namespace MinecraftButBetter.Screens
                 //determined indexes of face edges
 
 
+
+
+            }
+            int halfWidth = this.Width / 2;
+            int halfHeight = this.Height / 2;
+            int crosshairScale = 10;
+            Pen blackPen = new Pen(Color.Black, 3);
+
+            e.Graphics.DrawLine(blackPen, halfWidth, halfHeight - crosshairScale, halfWidth, halfHeight + crosshairScale);
+            e.Graphics.DrawLine(blackPen, halfWidth - crosshairScale, halfHeight, halfWidth + crosshairScale, halfHeight);
+
+            if(ray != null)
+            {
+                e.Graphics.FillEllipse(blackBrush, new Rectangle(multiplierToCoords(camera.pointToScreen(ray.end)).X, multiplierToCoords(camera.pointToScreen(ray.end)).Y, 5, 5));
             }
         }
         private Point multiplierToCoords(PointF m)
@@ -258,7 +250,11 @@ namespace MinecraftButBetter.Screens
         private void GameScreen_MouseMove(object sender, MouseEventArgs e)
         {
             camera.rotate(e.X - (this.Width / 2), e.Y - (this.Height / 2), this.Width, this.Height);
-            label1.Text = camera.headingY.ToString();
+        }
+
+        private void GameScreen_MouseClick(object sender, MouseEventArgs e)
+        {
+            ray = new Ray(camera.pos(), camera.headingX, camera.headingY, 5);
         }
     }
 }

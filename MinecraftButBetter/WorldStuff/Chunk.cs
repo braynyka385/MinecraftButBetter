@@ -8,6 +8,7 @@ namespace MinecraftButBetter.WorldStuff
 {
     class Chunk
     {
+        public static readonly UInt32 chunkSize = 8;
         private List<Block> blocks;
         int x, y;
         int xW, yW;

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,12 +13,14 @@ namespace MinecraftButBetter.WorldStuff
         private int x, y, z;
         public PointD3[] points = new PointD3[8];
         private BlockType type;
-        private int myIndex = 0;
         private Face[] faces;
+        protected Color[] faceColors = new Color[6];
+        public SolidBrush[] faceBrush = new SolidBrush[6];
 
         public double distSq;
-        public Block(int x, int y, int z)
+        public Block(int x, int y, int z, BlockType t)
         {
+            this.type = t;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -33,10 +36,17 @@ namespace MinecraftButBetter.WorldStuff
             faces = new Face[6];
             for(int i = 0; i < 6; i++)
             {
-                faces[i] = new Face((FaceIndex)i, type, new int[] {x,y,z});
+                faces[i] = new Face((FaceIndex)i, type, new int[] {x,y,z}, faceColors[i]);
             }
         }
 
+        protected void generateBrushes()
+        {
+            for(int i = 0; i < 6;i++)
+            {
+                faceBrush[i] = new SolidBrush(faceColors[i]);
+            }
+        }
         public void setVisibility(Face f, bool val)
         {
             faces[(int)f.side].isVisible = val;
@@ -51,11 +61,67 @@ namespace MinecraftButBetter.WorldStuff
             //return new Face(side, this.type);
             return faces[(int)side];
         }
+        public void selfObstructFaces(PointD3 camera)
+        {
+            for(int i = 0; i < 6; i++)
+            {
+                faces[i].obstructedByOwnBlock = false;
+            }
+            switch (closestPointIndex(camera))
+            {
+                case 0:
+                    faces[0].obstructedByOwnBlock = true;
+                    faces[2].obstructedByOwnBlock = true;
+                    faces[4].obstructedByOwnBlock = true;
+                    break;
+                case 1:
+                    faces[0].obstructedByOwnBlock = true;
+                    faces[3].obstructedByOwnBlock = true;
+                    faces[4].obstructedByOwnBlock = true;
+                    break;
+                case 2:
+                    faces[1].obstructedByOwnBlock = true;
+                    faces[2].obstructedByOwnBlock = true;
+                    faces[4].obstructedByOwnBlock = true;
+                    break;
+                case 3:
+                    faces[1].obstructedByOwnBlock = true;
+                    faces[3].obstructedByOwnBlock = true;
+                    faces[4].obstructedByOwnBlock = true;
+                    break;
+                case 4:
+                    faces[0].obstructedByOwnBlock = true;
+                    faces[2].obstructedByOwnBlock = true;
+                    faces[5].obstructedByOwnBlock = true;
+                    break;
+                case 5:
+                    faces[0].obstructedByOwnBlock = true;
+                    faces[3].obstructedByOwnBlock = true;
+                    faces[5].obstructedByOwnBlock = true;
+                    break;
+            }
+        }
+        private int closestPointIndex(PointD3 to)
+        {
+            int bestIndex = 0;
+            double bestDistance = 100000;
+            for(int i = 0; i < 8; i++)
+            {
+                double dist = points[i].distanceSquared(to);
+                if (dist  < bestDistance)
+                {
+                    bestIndex = i;
+                    bestDistance = dist;
+                }
+            }
+            return bestIndex;
+        }
         
     }
 
     class Face
     {
+        public bool obstructedByOwnBlock = false;
         public bool isVisible = true;
         public FaceIndex side;
         private FaceIndex opposingFace;
@@ -76,6 +142,17 @@ namespace MinecraftButBetter.WorldStuff
             opposingFace = getOpposingFace();
             locOfImpedingBlock = locationOfImpedingBlock(pos);
 
+
+        }
+        public Face(FaceIndex _side, BlockType _parentBlockType, int[] pos, Color c)
+        {
+            side = _side;
+            parentBlockType = _parentBlockType;
+            edges = sideToEdges(side);
+            corners = sideToCorners(side);
+            opposingFace = getOpposingFace();
+            locOfImpedingBlock = locationOfImpedingBlock(pos);
+            this.color = c;
 
         }
 

@@ -40,8 +40,7 @@ namespace MinecraftButBetter.Rendering
         }
         public void rotate(int toX, int toY, int w, int h)
         {
-            double cHXSP = map(headingX, 0, 360, 0, w);
-            double cHYSP = map(headingY, -90, 90, 0, h);
+         
             headingX = map(toX, 0, w, 360, 0);
             headingY = map(toY, 0, h, 0, 180);
             
@@ -58,18 +57,19 @@ namespace MinecraftButBetter.Rendering
             double XZOffset = ((Math.Cos(headingXRad) * delta.X) + (Math.Sin(headingXRad) * delta.Z));
 
             double YDistFromCam = (Math.Cos(headingYRad) * XZDistFromCam) - (Math.Sin(headingYRad) * delta.Y);
-            double YOffset = (Math.Cos(headingYRad) * delta.Y) + (Math.Sin(headingYRad) * XZDistFromCam);
+            double YOffset = (Math.Cos(headingYRad / 2) * delta.Y) + (Math.Sin(headingYRad) * XZDistFromCam);
 
-            XZDistFromCam -= (Math.Sin(headingYRad) * delta.Y); //Comment out if there's some weirdness with the size of blocks depending on y-axis
+            XZDistFromCam -= 3*(Math.Sin(headingYRad) * delta.Y); //Comment out if there's some weirdness with the size of blocks depending on y-axis
             //TODO: Figure out why Y headings approaching 90 cause distortion
             double x = -1;
             double y = -1;
- 
+            
+
             x = map(XZOffset, 0, XZDistFromCam, 0.5, 1);
             y = map(YOffset, 0, YDistFromCam, 0.5, 1);
 
             // y = 0;
-            if (x > 2 || y > 2 || x < -1|| y < -1 || YDistFromCam < 0)
+            if (x > 3 || y > 3 || x < -2|| y < -2 || YDistFromCam < 0)
             {
                 return new PointF(-1, -1);
             }

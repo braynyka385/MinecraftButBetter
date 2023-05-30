@@ -30,7 +30,6 @@
         {
             components = new System.ComponentModel.Container();
             gameTimer = new System.Windows.Forms.Timer(components);
-            label1 = new Label();
             SuspendLayout();
             // 
             // gameTimer
@@ -38,35 +37,23 @@
             gameTimer.Interval = 20;
             gameTimer.Tick += gameTimer_Tick;
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(536, 109);
-            label1.Name = "label1";
-            label1.Size = new Size(59, 25);
-            label1.TabIndex = 0;
-            label1.Text = "label1";
-            // 
             // GameScreen
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(label1);
             DoubleBuffered = true;
-            Margin = new Padding(4, 5, 4, 5);
             Name = "GameScreen";
-            Size = new Size(1429, 1250);
+            Size = new Size(1000, 750);
             Paint += GameScreen_Paint;
             KeyUp += GameScreen_KeyUp;
+            MouseClick += GameScreen_MouseClick;
             MouseMove += GameScreen_MouseMove;
             PreviewKeyDown += GameScreen_PreviewKeyDown;
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
         private System.Windows.Forms.Timer gameTimer;
-        private Label label1;
     }
 }

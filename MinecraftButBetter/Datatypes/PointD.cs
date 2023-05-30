@@ -46,6 +46,7 @@ namespace MinecraftButBetter.Datatypes
             Y /= point.Y;
             Z /= point.Z;
         }
+        
         public bool equals(PointD3 point)
         {
             if(point.X == X && point.Y ==  Y && point.Z == Z) return true;
@@ -62,6 +63,14 @@ namespace MinecraftButBetter.Datatypes
         public double distance(PointD3 other)
         {
             return Math.Sqrt((X - other.X) * (X - other.X) + (Y - other.Y) * (Y - other.Y) + (Z - other.Z) * (Z - other.Z));
+        }
+        public double distanceSquared(PointD3 other)
+        {
+            return (X - other.X) * (X - other.X) + (Y - other.Y) * (Y - other.Y) + (Z - other.Z) * (Z - other.Z);
+        }
+        public double magnitude()
+        {
+            return Math.Sqrt(X * X +  Y * Y +  Z * Z);
         }
     }
 }
