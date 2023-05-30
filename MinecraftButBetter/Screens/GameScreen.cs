@@ -18,62 +18,22 @@ namespace MinecraftButBetter.Screens
     {
         Random random;
         Camera camera;
-        List<PointD3> pointD3s = new List<PointD3>();
-        List<Block> blocks = new List<Block>();
+        //List<Block> blocks = new List<Block>();
         bool[] pressedKeys = new bool[6];
         Ray ray;
+        World world = new World(6, 48);
         public GameScreen()
         {
             random = new Random();
             InitializeComponent();
-            camera = new Camera(-3, 2, 4, 0, 90, 90, 0, 0);
-            for (int x = 0; x < 50; x++)
-            {
-                for (int y = 0; y < 1; y++)
-                {
-                    for (int z = 0; z < 50; z++)
-                    {
-                        int yy = random.Next(-1, 1);
-                        Block b;
-                        if (yy < 0)
-                        {
-                            b = new BlockStone(x, yy, z);
+            camera = new Camera(-3, 2, 4, 90, 90, 0, 0);
 
-                        }
-                        else
-                        {
-                            b = new BlockGrass(x, yy, z);
-
-                        }
-
-                        blocks.Add(b);
-
-                    }
-                }
-
-            }
-
-            foreach (Block b in blocks)
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    Face f = b.getFace((FaceIndex)i);
-
-                    foreach (Block b2 in blocks)
-                    {
-                        PointD3 p = new PointD3(f.locOfImpedingBlock);
-                        if (b2.points[0].equals(p))
-                        {
-                            b.setVisibility(f, false);
-                        }
-                    }
-                }
-            }
+            world.generateChunks(camera.pos());
 
 
 
-            pointD3s.Add(new PointD3(0, 0, 0));
-            pointD3s.Add(new PointD3(1, 0, 0));
+
+
 
             gameTimer.Start();
         }
@@ -81,27 +41,28 @@ namespace MinecraftButBetter.Screens
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
             SolidBrush blackBrush = new SolidBrush(Color.Black);
-
-            foreach (Block b in blocks)
+            foreach (Chunk c in world.getLoadedChunks())
             {
-                PointF[] pointsFs = new PointF[8];
-                for (int i = 0; i < 8; i++)
+                foreach (Block b in c.blocks)
                 {
-                    PointF p = camera.pointToScreen(b.points[i]);
-                    pointsFs[i] = p;
-                }
-
-                int[] corners = new int[4];
-                b.selfObstructFaces(camera.pos());
-                for (int j = 5; j >= 0; j--)
-                {
-                    Face f = b.getFace((FaceIndex)j);
-                    if (f.isVisible && !f.obstructedByOwnBlock)
+                    PointF[] pointsFs = new PointF[8];
+                    for (int i = 0; i < 8; i++)
                     {
-                        corners = f.getCorners();
+                        PointF p = camera.pointToScreen(b.points[i]);
+                        pointsFs[i] = p;
+                    }
 
-                        Point[] converted =
+                    int[] corners = new int[4];
+                    b.selfObstructFaces(camera.pos());
+                    for (int j = 5; j >= 0; j--)
+                    {
+                        Face f = b.getFace((FaceIndex)j);
+                        if (f.isVisible && !f.obstructedByOwnBlock)
                         {
+                            corners = f.getCorners();
+
+                            Point[] converted =
+                            {
                            multiplierToCoords(pointsFs[corners[0]]),
                            multiplierToCoords(pointsFs[corners[1]]),
                            multiplierToCoords(pointsFs[corners[2]]),
@@ -109,50 +70,20 @@ namespace MinecraftButBetter.Screens
 
                         };
 
-                        if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
-                            e.Graphics.FillPolygon(b.faceBrush[j], converted);
+                            if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
+                                e.Graphics.FillPolygon(b.faceBrush[j], converted);
+                        }
+
+
                     }
 
 
+
+
+
                 }
-
-                #region 
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[1]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[2]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[1]), multiplierToCoords(pointsFs[3]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[2]), multiplierToCoords(pointsFs[3])); // z-
-
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[4]), multiplierToCoords(pointsFs[5]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[4]), multiplierToCoords(pointsFs[6]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[5]), multiplierToCoords(pointsFs[7]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[6]), multiplierToCoords(pointsFs[7])); // z+
-
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[2]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[4]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[2]), multiplierToCoords(pointsFs[6]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[4]), multiplierToCoords(pointsFs[6])); // x-
-
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[1]), multiplierToCoords(pointsFs[3]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[1]), multiplierToCoords(pointsFs[5]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[3]), multiplierToCoords(pointsFs[7]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[5]), multiplierToCoords(pointsFs[7])); // x+
-
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[1]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[0]), multiplierToCoords(pointsFs[4]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[1]), multiplierToCoords(pointsFs[5]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[4]), multiplierToCoords(pointsFs[5])); // y-
-
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[2]), multiplierToCoords(pointsFs[3]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[2]), multiplierToCoords(pointsFs[6]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[3]), multiplierToCoords(pointsFs[7]));
-                //e.Graphics.DrawLine(blackPen, multiplierToCoords(pointsFs[6]), multiplierToCoords(pointsFs[7])); // y+
-                #endregion //determined indexes of face edges 
-                //determined indexes of face edges
-
-
-
-
             }
+            
             int halfWidth = this.Width / 2;
             int halfHeight = this.Height / 2;
             int crosshairScale = 10;
@@ -234,16 +165,20 @@ namespace MinecraftButBetter.Screens
 
             camera.move(new PointD3(x, y, z));
 
-
-            foreach (Block b in blocks)
+            foreach (Chunk c in world.loadChunks(camera.pos()))
             {
-                double xFactor = b.points[0].X - camera.pos().X;
-                double yFactor = b.points[0].Y - camera.pos().Y;
-                double zFactor = b.points[0].Z - camera.pos().Z;
-                b.distSq = (xFactor * xFactor) + (yFactor * yFactor) + (zFactor * zFactor);
+                foreach (Block b in c.blocks)
+                {
+                    double xFactor = b.points[0].X - camera.pos().X;
+                    double yFactor = b.points[0].Y - camera.pos().Y;
+                    double zFactor = b.points[0].Z - camera.pos().Z;
+                    b.distSq = (xFactor * xFactor) + (yFactor * yFactor) + (zFactor * zFactor);
+                }
+                c.blocks = c.blocks.OrderByDescending(b => b.distSq).ToList();
+
             }
 
-            blocks = blocks.OrderByDescending(b => b.distSq).ToList();
+
             Refresh();
         }
 

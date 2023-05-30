@@ -10,14 +10,13 @@ namespace MinecraftButBetter.Rendering
     class Camera
     {
         PointD3 loc;
-        int renderDistance;
+        //int renderDistance;
         int hFOV;
         int vFOV;
         public double headingX, headingY;
-        public Camera(double x, double y, double z, int renderDistance, int hFOV, int vFOV, double headingX, double headingY)
+        public Camera(double x, double y, double z, int hFOV, int vFOV, double headingX, double headingY)
         {
             this.loc = new PointD3(x,y,z);
-            this.renderDistance = renderDistance;
             this.hFOV = hFOV;
             this.vFOV = vFOV;
             this.headingX = headingX;
