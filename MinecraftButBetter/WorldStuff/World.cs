@@ -67,11 +67,24 @@ namespace MinecraftButBetter.WorldStuff
             }
 
         }
+        public void optimizeChunks()
+        {
+            foreach (Chunk c in loadedChunks)
+            {
+                c.optimizeChunk();
+
+            }
+        }
+        public void removeBlock(int chunkIndex, int blockIndex)
+        {
+            loadedChunks[chunkIndex].blocks.RemoveAt(blockIndex);
+            loadedChunks[chunkIndex].optimizeChunk();
+        }
         double chunkDistance(PointD3 to, Chunk c)
         {
             double distSq = (to.X - c.X) * (to.X - c.X) + (to.Z - c.Z) * (to.Z - c.Z);
 
-            if(distSq < renderDistanceSquared)
+            if(distSq < renderDistanceSquared * Chunk.chunkSize)
             {
                 return distSq;
             }

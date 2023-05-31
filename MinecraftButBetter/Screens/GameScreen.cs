@@ -16,28 +16,21 @@ namespace MinecraftButBetter.Screens
 {
     public partial class GameScreen : UserControl
     {
+        Ray ray;
         Random random;
         Camera camera;
         //List<Block> blocks = new List<Block>();
         bool[] pressedKeys = new bool[6];
-        Ray ray;
-        World world = new World(6, 48);
+        //Ray ray;
+        World world = new World(6, 12);
         public GameScreen()
         {
             random = new Random();
             InitializeComponent();
-            camera = new Camera(-3, 2, 4, 90, 90, 0, 0);
-
+            camera = new Camera(0, 2, 0, 90, 90, 0, 0);
             world.generateChunks(camera.pos());
-
-
-
-
-
-
             gameTimer.Start();
         }
-
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
             SolidBrush blackBrush = new SolidBrush(Color.Black);
@@ -92,10 +85,6 @@ namespace MinecraftButBetter.Screens
             e.Graphics.DrawLine(blackPen, halfWidth, halfHeight - crosshairScale, halfWidth, halfHeight + crosshairScale);
             e.Graphics.DrawLine(blackPen, halfWidth - crosshairScale, halfHeight, halfWidth + crosshairScale, halfHeight);
 
-            if(ray != null)
-            {
-                e.Graphics.FillEllipse(blackBrush, new Rectangle(multiplierToCoords(camera.pointToScreen(ray.end)).X, multiplierToCoords(camera.pointToScreen(ray.end)).Y, 5, 5));
-            }
         }
         private Point multiplierToCoords(PointF m)
         {
@@ -189,7 +178,28 @@ namespace MinecraftButBetter.Screens
 
         private void GameScreen_MouseClick(object sender, MouseEventArgs e)
         {
-            ray = new Ray(camera.pos(), camera.headingX, camera.headingY, 5);
+            ray = new Ray(10, camera);
+            List<Block> blocks = new List<Block>();
+            List<Chunk> chunks = world.getLoadedChunks();
+            List<int> cI = new List<int>();
+            List<int> bIC = new List<int>();
+            for (int i = chunks.Count - 1; i >= chunks.Count - 10; i--)
+            {
+                for(int bb =  0; bb < chunks[i].blocks.Count; bb++)
+                {
+                    blocks.Add(chunks[i].blocks[bb]);
+                    cI.Add(i);
+                    bIC.Add(bb);
+                }
+
+            }
+           int j = ray.indexOfIntersectedBlock(blocks);
+            if(j >=0) 
+            {
+                world.removeBlock(cI[j], bIC[j]);
+                world.optimizeChunks();
+            }
+            
         }
     }
 }

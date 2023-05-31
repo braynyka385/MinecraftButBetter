@@ -35,6 +35,7 @@ namespace MinecraftButBetter.WorldStuff
                 for (int i = 0; i < 6; i++)
                 {
                     Face f = b.getFace((FaceIndex)i);
+                    b.setVisibility(f, true);
 
                     foreach (Block b2 in blocks)
                     {
