@@ -22,12 +22,12 @@ namespace MinecraftButBetter.Screens
         //List<Block> blocks = new List<Block>();
         bool[] pressedKeys = new bool[6];
         //Ray ray;
-        World world = new World(6, 12);
+        World world = new World(8, 16);
         public GameScreen()
         {
             random = new Random();
             InitializeComponent();
-            camera = new Camera(0, 2, 0, 90, 90, 0, 0);
+            camera = new Camera(0, 3, 0, 90, 90, 0, 0);
             world.generateChunks(camera.pos());
             gameTimer.Start();
         }
@@ -178,6 +178,7 @@ namespace MinecraftButBetter.Screens
 
         private void GameScreen_MouseClick(object sender, MouseEventArgs e)
         {
+            
             ray = new Ray(10, camera);
             List<Block> blocks = new List<Block>();
             List<Chunk> chunks = world.getLoadedChunks();
@@ -196,7 +197,43 @@ namespace MinecraftButBetter.Screens
            int j = ray.indexOfIntersectedBlock(blocks);
             if(j >=0) 
             {
-                world.removeBlock(cI[j], bIC[j]);
+                if(e.Button == MouseButtons.Left)
+                {
+                    world.removeBlock(cI[j], bIC[j]);
+
+                }
+                else if(e.Button == MouseButtons.Right)
+                {
+                    FaceIndex clickedSide = ray.clickedFace(blocks[j]);
+                    PointD3 delta = new PointD3(0,0,0); 
+                    switch(clickedSide)
+                    {
+                        case FaceIndex.TOP:
+                            delta.Y += 1;
+                            break;
+                        case FaceIndex.BOTTOM:
+                            delta.Y -= 1;
+                            break;
+                        case FaceIndex.LEFT:
+                            delta.X += 1;
+                            break;
+                        case FaceIndex.RIGHT:
+                            delta.X -= 1;
+                            break;
+                        case FaceIndex.FRONT:
+                            delta.Z += 1;
+                            break;
+                        case FaceIndex.BACK:
+                            delta.Z -= 1;
+                            break;
+
+                    }
+                    Block clicked = blocks[j];
+                    PointD3 newPos = clicked.points[0].added(delta);
+                    Block newBlock = new BlockStone((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
+
+                    world.addBlock(newBlock);
+                }
                 world.optimizeChunks();
             }
             

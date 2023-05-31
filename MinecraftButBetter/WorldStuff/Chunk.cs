@@ -27,7 +27,17 @@ namespace MinecraftButBetter.WorldStuff
             generateChunk(generatorType);
 
         }
+        public bool contains(PointD3 point)
+        {
+            double bX = point.X;
+            double bZ = point.Z;
 
+            if (bX >= X && bZ >= Z && bX < X + chunkSize && bZ < Z + chunkSize)
+            {
+                return true;
+            }
+            return false;
+        }
         public void optimizeChunk()
         {
             foreach (Block b in blocks)
@@ -65,13 +75,24 @@ namespace MinecraftButBetter.WorldStuff
                             if (y < 0)
                             {
                                 b = new BlockStone(x + X, y, z + Z);
-
                             }
                             else
                             {
                                 b = new BlockGrass(x + X, y, z + Z);
-
                             }
+
+                            blocks.Add(b);
+                        }
+                    }
+                    break;
+                case GeneratorType.Flat:
+                    for (int x = 0; x < chunkSize; x++)
+                    {
+                        for (int z = 0; z < chunkSize; z++)
+                        {
+                            int y = 1;
+                            Block b;
+                                b = new BlockGrass(x + X, y, z + Z);
 
                             blocks.Add(b);
                         }
@@ -84,6 +105,7 @@ namespace MinecraftButBetter.WorldStuff
     enum GeneratorType
     {
         Random,
-        Perlin
+        Perlin,
+        Flat
     }
 }

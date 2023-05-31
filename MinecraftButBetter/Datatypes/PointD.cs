@@ -28,6 +28,10 @@ namespace MinecraftButBetter.Datatypes
             Y += point.Y;
             Z += point.Z;
         }
+        public PointD3 added(PointD3 point)
+        {
+            return new PointD3(X + point.X, Y + point.Y, Z + point.Z);
+        }
         public void subtract(PointD3 point)
         {
             X -= point.X;
