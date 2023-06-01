@@ -15,8 +15,10 @@ namespace MinecraftButBetter.WorldStuff
         private BlockType type;
         private Face[] faces;
         protected Color[] faceColors = new Color[6];
+        protected Color[,,] faceTextures;
+        public bool hasTexture = false;
         public SolidBrush[] faceBrush = new SolidBrush[6];
-
+        public SolidBrush[,,] faceTextureBrush = new SolidBrush[6,2,2];
         public double distSq;
         public Block(int x, int y, int z, BlockType t)
         {
@@ -42,9 +44,25 @@ namespace MinecraftButBetter.WorldStuff
 
         protected void generateBrushes()
         {
-            for(int i = 0; i < 6;i++)
+            if(!hasTexture)
             {
-                faceBrush[i] = new SolidBrush(faceColors[i]);
+                for (int i = 0; i < 6; i++)
+                {
+                    faceBrush[i] = new SolidBrush(faceColors[i]);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    for(int j = 0; j < 2; j++)
+                    {
+                        for(int k = 0; k < 2; k++)
+                        {
+                            faceTextureBrush[i,j,k] = new SolidBrush(faceTextures[i,j,k]);
+                        }
+                    }
+                }
             }
         }
         public void setVisibility(Face f, bool val)

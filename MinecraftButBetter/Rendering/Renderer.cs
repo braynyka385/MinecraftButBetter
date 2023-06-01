@@ -58,7 +58,7 @@ namespace MinecraftButBetter.Rendering
             double YDistFromCam = (Math.Cos(headingYRad) * XZDistFromCam) - (Math.Sin(headingYRad) * delta.Y);
             double YOffset = (Math.Cos(headingYRad / 2) * delta.Y) + (Math.Sin(headingYRad) * XZDistFromCam);
 
-            XZDistFromCam -= 3*(Math.Sin(headingYRad) * delta.Y); //Comment out if there's some weirdness with the size of blocks depending on y-axis
+            XZDistFromCam -= (Math.Sin(headingYRad) * delta.Y); //Comment out if there's some weirdness with the size of blocks depending on y-axis
             //TODO: Figure out why Y headings approaching 90 cause distortion
             double x = -1;
             double y = -1;

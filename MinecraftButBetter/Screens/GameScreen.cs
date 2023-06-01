@@ -33,42 +33,11 @@ namespace MinecraftButBetter.Screens
         }
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
-            SolidBrush blackBrush = new SolidBrush(Color.Black);
             foreach (Chunk c in world.getLoadedChunks())
             {
                 foreach (Block b in c.blocks)
                 {
-                    PointF[] pointsFs = new PointF[8];
-                    for (int i = 0; i < 8; i++)
-                    {
-                        PointF p = camera.pointToScreen(b.points[i]);
-                        pointsFs[i] = p;
-                    }
-
-                    int[] corners = new int[4];
-                    b.selfObstructFaces(camera.pos());
-                    for (int j = 5; j >= 0; j--)
-                    {
-                        Face f = b.getFace((FaceIndex)j);
-                        if (f.isVisible && !f.obstructedByOwnBlock)
-                        {
-                            corners = f.getCorners();
-
-                            Point[] converted =
-                            {
-                           multiplierToCoords(pointsFs[corners[0]]),
-                           multiplierToCoords(pointsFs[corners[1]]),
-                           multiplierToCoords(pointsFs[corners[2]]),
-                           multiplierToCoords(pointsFs[corners[3]])
-
-                        };
-
-                            if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
-                                e.Graphics.FillPolygon(b.faceBrush[j], converted);
-                        }
-
-
-                    }
+                    drawBlock(b, e.Graphics);
 
 
 
@@ -85,6 +54,118 @@ namespace MinecraftButBetter.Screens
             e.Graphics.DrawLine(blackPen, halfWidth, halfHeight - crosshairScale, halfWidth, halfHeight + crosshairScale);
             e.Graphics.DrawLine(blackPen, halfWidth - crosshairScale, halfHeight, halfWidth + crosshairScale, halfHeight);
 
+        }
+        void drawBlock(Block b, Graphics g)
+        {
+            PointF[] pointsFs = new PointF[8];
+            for (int i = 0; i < 8; i++)
+            {
+                PointF p = camera.pointToScreen(b.points[i]);
+                pointsFs[i] = p;
+            }
+
+            int[] corners = new int[4];
+            b.selfObstructFaces(camera.pos());
+            for (int j = 5; j >= 0; j--)
+            {
+                Face f = b.getFace((FaceIndex)j);
+                if (f.isVisible && !f.obstructedByOwnBlock)
+                {
+                    corners = f.getCorners();
+
+                    
+
+                    if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
+                    {
+                        if (!b.hasTexture)
+                        {
+                            Point[] converted =
+                            {
+                                multiplierToCoords(pointsFs[corners[0]]),
+                                multiplierToCoords(pointsFs[corners[1]]),
+                                multiplierToCoords(pointsFs[corners[2]]),
+                                multiplierToCoords(pointsFs[corners[3]])
+
+                            };
+                            g.FillPolygon(b.faceBrush[j], converted);
+
+                        }
+                        else
+                        {
+                            int[,] fill = new int[4,2] 
+                            {
+                                {0,0},
+                                {1,0},
+                                {0,1},
+                                {1,1},
+                            };
+                            //camera.headingY = 0; // L.O.L
+                            for (int i  = 0; i < 4; i++)
+                            {
+                                //Point[] points =
+                                //{
+                                //    calculateMidpoint(converted[i], converted[0]),
+                                //    calculateMidpoint(converted[i], converted[1]),
+                                //    calculateMidpoint(converted[i], converted[2]),
+                                //    calculateMidpoint(converted[i], converted[3])
+                                //};
+                                PointF[] midpoints =
+                                {
+                                    calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[0]]),
+                                    calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[1]]),
+                                    calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[2]]),
+                                    calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[3]])
+                                };
+                                Point[] converted =
+                            {
+                                multiplierToCoords(midpoints[0]),
+                                multiplierToCoords(midpoints[1]),
+                                multiplierToCoords(midpoints[2]),
+                                multiplierToCoords(midpoints[3])
+
+                            };
+                                g.FillPolygon(b.faceTextureBrush[j, fill[i, 0], fill[i, 1]], converted);
+                            }
+                            //Point[] points =
+                            //{
+                            //    converted[0],
+                            //    calculateMidpoint(converted[0], converted[1]),
+                            //    calculateMidpoint(converted[0], converted[2]),
+                            //    calculateMidpoint(converted[0], converted[3])
+                            //};
+                            ////points[0].Y += 2;
+                            //g.FillPolygon(b.faceTextureBrush[j, 0,0], points);
+
+                            //points = new Point[]
+                            //{
+                            //    calculateMidpoint(converted[0], converted[1]),
+                            //    converted[1],
+                            //    calculateMidpoint(converted[1], converted[2]),
+                            //    calculateMidpoint(converted[1], converted[3])
+                            //};
+                            //g.FillPolygon(b.faceTextureBrush[j, 0, 1], points);
+                            //points = new Point[]
+                            //{
+                            //    calculateMidpoint(converted[0], converted[2]),
+                            //    converted[1],
+                            //    calculateMidpoint(converted[1], converted[2]),
+                            //    calculateMidpoint(converted[1], converted[3])
+                            //};
+                            //g.FillPolygon(b.faceTextureBrush[j, 0, 1], points);
+                        }
+                    }
+                }
+
+
+            }
+        }
+        private Point calculateMidpoint(Point p1, Point p2)
+        {
+            return new Point((p1.X + p2.X) /2 , (p1.Y + p2.Y) /2);
+        }
+        private PointF calculateMidpoint(PointF p1, PointF p2)
+        {
+            return new PointF((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
         }
         private Point multiplierToCoords(PointF m)
         {
