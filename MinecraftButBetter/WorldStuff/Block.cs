@@ -372,7 +372,7 @@ namespace MinecraftButBetter.WorldStuff
 
     public enum FaceIndex : int
     {
-        TOP = 0, BOTTOM = 1, LEFT = 2, RIGHT = 3, FRONT = 4, BACK = 5
+        TOP = 0, BOTTOM = 1, LEFT = 2, RIGHT = 3, FRONT = 4, BACK = 5, NONE = 401
     }
     public enum BlockType : int
     {

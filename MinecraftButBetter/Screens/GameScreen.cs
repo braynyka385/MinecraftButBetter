@@ -332,11 +332,15 @@ namespace MinecraftButBetter.Screens
                             break;
 
                     }
-                    Block clicked = blocks[j];
-                    PointD3 newPos = clicked.points[0].added(delta);
-                    Block newBlock = new BlockStone((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
+                    if(clickedSide != FaceIndex.NONE)
+                    {
+                        Block clicked = blocks[j];
+                        PointD3 newPos = clicked.points[0].added(delta);
+                        Block newBlock = new BlockStone((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
 
-                    world.addBlock(newBlock);
+                        world.addBlock(newBlock);
+                    }
+                    
                 }
                 world.optimizeChunks();
             }

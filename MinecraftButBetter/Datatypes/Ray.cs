@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace MinecraftButBetter.Datatypes
 {
-     class Ray
-     {
+    class Ray
+    {
         public PointD3 start, end;
         double maxDistance;
         double maxDistSq;
@@ -45,9 +45,9 @@ namespace MinecraftButBetter.Datatypes
         {
             int index = -1;
             double bestDistSq = 1000000000;
-            PointF midPoint = new PointF(0.5f,0.5f);
+            PointF midPoint = new PointF(0.5f, 0.5f);
             PointF endPoint = new PointF(100f, 100f);
-            for(int i = 0; i < blocks.Count; i++)
+            for (int i = 0; i < blocks.Count; i++)
             {
                 if (blocks[i].distSq < maxDistSq && blocks[i].distSq < bestDistSq)
                 {
@@ -62,7 +62,7 @@ namespace MinecraftButBetter.Datatypes
                         Face f = blocks[i].getFace((FaceIndex)j);
                         int[] corners = f.getCorners();
                         int intersections = 0;
-                        if (f.isVisible && !f.obstructedByOwnBlock)
+                        if (f.isVisible && !f.obstructedByOwnBlock && pointOnScreen(pointsFs[corners[0]]) && pointOnScreen(pointsFs[corners[1]]) && pointOnScreen(pointsFs[corners[2]]) && pointOnScreen(pointsFs[corners[3]]))
                         {
                             corners = f.getCorners();
                             if (LineIntersectsLine(midPoint, endPoint, pointsFs[corners[0]], pointsFs[corners[1]]))
@@ -82,7 +82,7 @@ namespace MinecraftButBetter.Datatypes
                                 intersections++;
                             }
 
-                            if(intersections % 2 != 0)
+                            if (intersections % 2 != 0)
                             {
                                 index = i;
                                 bestDistSq = blocks[i].distSq;
@@ -108,7 +108,8 @@ namespace MinecraftButBetter.Datatypes
                 Face f = b.getFace((FaceIndex)j);
                 int[] corners = f.getCorners();
                 int intersections = 0;
-                if (f.isVisible && !f.obstructedByOwnBlock) // So... if a face is off towards the edge of the screen, only some of the edges will be rendered (I think),
+                if (f.isVisible && !f.obstructedByOwnBlock 
+                    && pointOnScreen(pointsFs[corners[0]]) && pointOnScreen(pointsFs[corners[1]]) && pointOnScreen(pointsFs[corners[2]]) && pointOnScreen(pointsFs[corners[3]])) // So... if a face is off towards the edge of the screen, only some of the edges will be rendered (I think),
                                                             // so the evenodd test will fail... This is why sometimes blocks place perpendicular to the aiming dir. (I think) {FIX}
                 {
                     corners = f.getCorners();
@@ -135,7 +136,16 @@ namespace MinecraftButBetter.Datatypes
                     }
                 }
             }
-            return FaceIndex.TOP;
+            return FaceIndex.NONE;
+        }
+
+        bool pointOnScreen(PointF p)
+        {
+            if(p.X >= 0 && p.X <= 1 && p.Y >= 0 && p.Y <= 1)
+            {
+                return true;
+            }
+            return false;
         }
         private double toRadians(double deg)
         {
