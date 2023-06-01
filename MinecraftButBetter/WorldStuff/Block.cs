@@ -85,7 +85,41 @@ namespace MinecraftButBetter.WorldStuff
             {
                 faces[i].obstructedByOwnBlock = false;
             }
-            switch (closestPointIndex(camera))
+            int test = closestPointIndex(camera);
+            //switch (test)
+            //{
+            //    case 0:
+            //        faces[0].obstructedByOwnBlock = true;
+            //        faces[2].obstructedByOwnBlock = true;
+            //        faces[4].obstructedByOwnBlock = true;
+            //        break;
+            //    case 1:
+            //        faces[0].obstructedByOwnBlock = true;
+            //        faces[3].obstructedByOwnBlock = true;
+            //        faces[4].obstructedByOwnBlock = true;
+            //        break;
+            //    case 2:
+            //        faces[1].obstructedByOwnBlock = true;
+            //        faces[2].obstructedByOwnBlock = true;
+            //        faces[4].obstructedByOwnBlock = true;
+            //        break;
+            //    case 3:
+            //        faces[1].obstructedByOwnBlock = true;
+            //        faces[3].obstructedByOwnBlock = true;
+            //        faces[4].obstructedByOwnBlock = true;
+            //        break;
+            //    case 4:
+            //        faces[0].obstructedByOwnBlock = true;
+            //        faces[2].obstructedByOwnBlock = true;
+            //        faces[5].obstructedByOwnBlock = true;
+            //        break;
+            //    case 5:
+            //        faces[0].obstructedByOwnBlock = true;
+            //        faces[3].obstructedByOwnBlock = true;
+            //        faces[5].obstructedByOwnBlock = true;
+            //        break;
+            //}
+            switch (test)
             {
                 case 0:
                     faces[0].obstructedByOwnBlock = true;
@@ -114,6 +148,16 @@ namespace MinecraftButBetter.WorldStuff
                     break;
                 case 5:
                     faces[0].obstructedByOwnBlock = true;
+                    faces[3].obstructedByOwnBlock = true;
+                    faces[5].obstructedByOwnBlock = true;
+                    break;
+                case 6:
+                    faces[1].obstructedByOwnBlock = true;
+                    faces[2].obstructedByOwnBlock = true;
+                    faces[5].obstructedByOwnBlock = true;
+                    break;
+                case 7:
+                    faces[1].obstructedByOwnBlock = true;
                     faces[3].obstructedByOwnBlock = true;
                     faces[5].obstructedByOwnBlock = true;
                     break;

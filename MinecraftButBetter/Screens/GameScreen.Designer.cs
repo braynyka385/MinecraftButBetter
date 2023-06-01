@@ -43,7 +43,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             DoubleBuffered = true;
             Name = "GameScreen";
-            Size = new Size(1000, 750);
+            Size = new Size(750, 750);
             Paint += GameScreen_Paint;
             KeyUp += GameScreen_KeyUp;
             MouseClick += GameScreen_MouseClick;

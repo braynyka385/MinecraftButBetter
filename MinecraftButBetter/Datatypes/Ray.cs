@@ -108,7 +108,8 @@ namespace MinecraftButBetter.Datatypes
                 Face f = b.getFace((FaceIndex)j);
                 int[] corners = f.getCorners();
                 int intersections = 0;
-                if (f.isVisible && !f.obstructedByOwnBlock)
+                if (f.isVisible && !f.obstructedByOwnBlock) // So... if a face is off towards the edge of the screen, only some of the edges will be rendered (I think),
+                                                            // so the evenodd test will fail... This is why sometimes blocks place perpendicular to the aiming dir. (I think) {FIX}
                 {
                     corners = f.getCorners();
                     if (LineIntersectsLine(midPoint, endPoint, pointsFs[corners[0]], pointsFs[corners[1]]))

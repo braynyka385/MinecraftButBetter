@@ -22,7 +22,7 @@ namespace MinecraftButBetter.Screens
         //List<Block> blocks = new List<Block>();
         bool[] pressedKeys = new bool[6];
         //Ray ray;
-        World world = new World(8, 16);
+        World world = new World(8, 10);
         public GameScreen()
         {
             random = new Random();
@@ -45,7 +45,7 @@ namespace MinecraftButBetter.Screens
 
                 }
             }
-            
+
             int halfWidth = this.Width / 2;
             int halfHeight = this.Height / 2;
             int crosshairScale = 10;
@@ -73,7 +73,7 @@ namespace MinecraftButBetter.Screens
                 {
                     corners = f.getCorners();
 
-                    
+
 
                     if (pointsFs[corners[0]].X != -1 && pointsFs[corners[1]].X != -1 && pointsFs[corners[2]].X != -1 && pointsFs[corners[3]].X != -1)
                     {
@@ -92,66 +92,92 @@ namespace MinecraftButBetter.Screens
                         }
                         else
                         {
-                            int[,] fill = new int[4,2] 
+                            //The 4 midpoints in any quad form a parrallelogram... therefore:
+                            PointF p1 = calculateMidpoint(pointsFs[corners[0]], pointsFs[corners[1]]);
+                            PointF p2 = calculateMidpoint(pointsFs[corners[1]], pointsFs[corners[2]]);
+                            PointF p12 = calculateMidpoint(p1, p2);
+
+
+
+                            PointF p3 = calculateMidpoint(pointsFs[corners[2]], pointsFs[corners[3]]);
+                            PointF p4 = calculateMidpoint(pointsFs[corners[3]], pointsFs[corners[0]]);
+                            PointF p34 = calculateMidpoint(p3, p4);
+
+
+                            PointF middleOfFace = calculateMidpoint(p12, p34);
+
+
+                            int[,] fill = new int[4, 2]
                             {
                                 {0,0},
                                 {1,0},
                                 {0,1},
                                 {1,1},
                             };
-                            //camera.headingY = 0; // L.O.L
-                            for (int i  = 0; i < 4; i++)
+                            for (int i = 0; i < 4; i++)
                             {
-                                //Point[] points =
-                                //{
-                                //    calculateMidpoint(converted[i], converted[0]),
-                                //    calculateMidpoint(converted[i], converted[1]),
-                                //    calculateMidpoint(converted[i], converted[2]),
-                                //    calculateMidpoint(converted[i], converted[3])
-                                //};
+
+                                //This only works well if the face appears to be a square... fix
+                                int[] nums = new int[]
+                                {
+                                    3,0,1,2
+                                }
+                                ;
+
+                                if(i == 1 || i == 3)
+                                {
+                                    nums = new int[] 
+                                     {
+                                        1,2,3,0 //I have no idea why this works
+                                    };
+                                }
                                 PointF[] midpoints =
                                 {
-                                    calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[0]]),
-                                    calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[1]]),
-                                    calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[2]]),
-                                    calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[3]])
+                                        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[nums[0]]]),
+                                        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[nums[1]]]),
+                                        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[nums[2]]]),
+                                        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[nums[3]]])
                                 };
+                                midpoints[3 - i] = middleOfFace;
                                 Point[] converted =
-                            {
-                                multiplierToCoords(midpoints[0]),
-                                multiplierToCoords(midpoints[1]),
-                                multiplierToCoords(midpoints[2]),
-                                multiplierToCoords(midpoints[3])
+                                {
+                                    multiplierToCoords(midpoints[0]),
+                                    multiplierToCoords(midpoints[1]),
+                                    multiplierToCoords(midpoints[2]),
+                                    multiplierToCoords(midpoints[3])
 
-                            };
+                                };
                                 g.FillPolygon(b.faceTextureBrush[j, fill[i, 0], fill[i, 1]], converted);
                             }
-                            //Point[] points =
-                            //{
-                            //    converted[0],
-                            //    calculateMidpoint(converted[0], converted[1]),
-                            //    calculateMidpoint(converted[0], converted[2]),
-                            //    calculateMidpoint(converted[0], converted[3])
-                            //};
-                            ////points[0].Y += 2;
-                            //g.FillPolygon(b.faceTextureBrush[j, 0,0], points);
 
-                            //points = new Point[]
+                            //int[,] fill = new int[4, 2]
                             //{
-                            //    calculateMidpoint(converted[0], converted[1]),
-                            //    converted[1],
-                            //    calculateMidpoint(converted[1], converted[2]),
-                            //    calculateMidpoint(converted[1], converted[3])
+                            //    {0,0},
+                            //    {1,0},
+                            //    {0,1},
+                            //    {1,1},
                             //};
-                            //g.FillPolygon(b.faceTextureBrush[j, 0, 1], points);
-                            //points = new Point[]
+                            //for (int i = 0; i < 4; i++)
                             //{
-                            //    calculateMidpoint(converted[0], converted[2]),
-                            //    converted[1],
-                            //    calculateMidpoint(converted[1], converted[2]),
-                            //    calculateMidpoint(converted[1], converted[3])
+
+                            //    //This only works well if the face appears to be a square... fix
+                            //    PointF[] midpoints =
+                            //    {
+                            //        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[0]]),
+                            //        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[1]]),
+                            //        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[2]]),
+                            //        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[3]])
+                            //    };
+                            //    Point[] converted =
+                            //{
+                            //    multiplierToCoords(midpoints[0]),
+                            //    multiplierToCoords(midpoints[1]),
+                            //    multiplierToCoords(midpoints[2]),
+                            //    multiplierToCoords(midpoints[3])
+
                             //};
-                            //g.FillPolygon(b.faceTextureBrush[j, 0, 1], points);
+                            //    g.FillPolygon(b.faceTextureBrush[j, fill[i, 0], fill[i, 1]], converted);
+                            //}
                         }
                     }
                 }
@@ -159,10 +185,7 @@ namespace MinecraftButBetter.Screens
 
             }
         }
-        private Point calculateMidpoint(Point p1, Point p2)
-        {
-            return new Point((p1.X + p2.X) /2 , (p1.Y + p2.Y) /2);
-        }
+
         private PointF calculateMidpoint(PointF p1, PointF p2)
         {
             return new PointF((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
@@ -259,15 +282,15 @@ namespace MinecraftButBetter.Screens
 
         private void GameScreen_MouseClick(object sender, MouseEventArgs e)
         {
-            
-            ray = new Ray(10, camera);
+
+            ray = new Ray(5, camera);
             List<Block> blocks = new List<Block>();
             List<Chunk> chunks = world.getLoadedChunks();
             List<int> cI = new List<int>();
             List<int> bIC = new List<int>();
             for (int i = chunks.Count - 1; i >= chunks.Count - 10; i--)
             {
-                for(int bb =  0; bb < chunks[i].blocks.Count; bb++)
+                for (int bb = 0; bb < chunks[i].blocks.Count; bb++)
                 {
                     blocks.Add(chunks[i].blocks[bb]);
                     cI.Add(i);
@@ -275,19 +298,19 @@ namespace MinecraftButBetter.Screens
                 }
 
             }
-           int j = ray.indexOfIntersectedBlock(blocks);
-            if(j >=0) 
+            int j = ray.indexOfIntersectedBlock(blocks);
+            if (j >= 0)
             {
-                if(e.Button == MouseButtons.Left)
+                if (e.Button == MouseButtons.Left)
                 {
                     world.removeBlock(cI[j], bIC[j]);
 
                 }
-                else if(e.Button == MouseButtons.Right)
+                else if (e.Button == MouseButtons.Right)
                 {
                     FaceIndex clickedSide = ray.clickedFace(blocks[j]);
-                    PointD3 delta = new PointD3(0,0,0); 
-                    switch(clickedSide)
+                    PointD3 delta = new PointD3(0, 0, 0);
+                    switch (clickedSide)
                     {
                         case FaceIndex.TOP:
                             delta.Y += 1;
@@ -317,7 +340,7 @@ namespace MinecraftButBetter.Screens
                 }
                 world.optimizeChunks();
             }
-            
+
         }
     }
 }
