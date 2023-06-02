@@ -25,7 +25,7 @@ namespace MinecraftButBetter.WorldStuff
         {
             for(int i = unloadedChunks.Count - 1; i >= 0; i--)
             {
-                double dSq = chunkDistance(playerPos, unloadedChunks[i]);
+                double dSq = chunkDistance(playerPos, unloadedChunks[i]);//
                 unloadedChunks[i].distFromPlayerSq = dSq;
                 if (dSq > 0)
                 {
@@ -60,8 +60,21 @@ namespace MinecraftButBetter.WorldStuff
             {
                 for (int z = -renderDist * Chunk.chunkSize; z <= renderDist * Chunk.chunkSize; z += Chunk.chunkSize)
                 {
-                    if(!chunkPositions.Contains(new int[] { x + roundedPlayerPos.X, z + roundedPlayerPos.Y }))
+                    int[] pos = new int[]
                     {
+                         x + roundedPlayerPos.X, z + roundedPlayerPos.Y
+                    };
+                    bool contains = false;
+                    foreach (int[] array in chunkPositions)
+                    {
+                        if (array[0] == pos[0] && array[1] == pos[1])
+                        {
+                            contains = true;
+                        }
+                    }
+                    if (!contains)
+                    {
+                        int cg = 0;
                         chunkPositions.Add(new int[] { x + roundedPlayerPos.X, z + roundedPlayerPos.Y });
                         Chunk c = new Chunk(GeneratorType.Flat, x + roundedPlayerPos.X, z + roundedPlayerPos.Y);
                         c.optimizeChunk();
@@ -111,21 +124,23 @@ namespace MinecraftButBetter.WorldStuff
             double d2 = (to.X - (c.X + chunkSize)) * (to.X - (c.X + chunkSize)) + (to.Z - c.Z) * (to.Z - c.Z);
             double d3 = (to.X - c.X) * (to.X - c.X) + (to.Z - (c.Z + chunkSize)) * (to.Z - (c.Z + chunkSize));
             double d4 = (to.X - (c.X + chunkSize)) * (to.X - (c.X + chunkSize)) + (to.Z - (c.Z + chunkSize)) * (to.Z - (c.Z + chunkSize));
-            if(d2 < distSq)
-            {
-                distSq = d2;
-            }
-            if(d3 < distSq)
-            {
-                distSq = d3;
-            }
-            if(d4 < distSq)
-            {
-                distSq = d4;
-            }
+            //if(d2 < distSq)
+            //{
+            //    distSq = d2;
+            //}
+            //if(d3 < distSq)
+            //{
+            //    distSq = d3;
+            //}
+            //if(d4 < distSq)
+            //{
+            //    distSq = d4;
+            //}
+
+            double finalDistTimesFour = (distSq + d2 + d3 + d4);
             if (distSq < renderDistanceSquared * Chunk.chunkSize)
             {
-                return distSq;
+                return finalDistTimesFour;
             }
             return -1;
         }

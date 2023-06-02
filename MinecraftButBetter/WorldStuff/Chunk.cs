@@ -10,6 +10,7 @@ namespace MinecraftButBetter.WorldStuff
 {
     class Chunk
     {
+        Random random = new Random();
         public static int chunkSize;
         public List<Block> blocks = new List<Block>();
         public readonly int X, Z;
@@ -61,7 +62,6 @@ namespace MinecraftButBetter.WorldStuff
 
         private void generateChunk(GeneratorType g)
         {
-            Random random = new Random();
 
             switch (g)
             {
@@ -88,14 +88,24 @@ namespace MinecraftButBetter.WorldStuff
                 case GeneratorType.Flat:
                     for (int x = 0; x < chunkSize; x++)
                     {
-                        for (int z = 0; z < chunkSize; z++)
+                        for(int y =  0; y < 3; y++)
                         {
-                            int y = 1;
-                            Block b;
-                                b = new BlockGrass(x + X, y, z + Z);
+                            for (int z = 0; z < chunkSize; z++)
+                            {
+                                Block b;
+                                if(y == 2)
+                                {
+                                    b = new BlockGrass(x + X, y, z + Z);
 
-                            blocks.Add(b);
+                                }
+                                else
+                                {
+                                    b = new BlockStone(x + X, y, z + Z);
+                                }
+                                blocks.Add(b);
+                            }
                         }
+                        
                     }
                     break;
             }

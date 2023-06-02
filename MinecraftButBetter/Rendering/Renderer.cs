@@ -68,7 +68,7 @@ namespace MinecraftButBetter.Rendering
             y = map(YOffset, 0, YDistFromCam, 0.5, 1);
 
             // y = 0;
-            if (x > 3 || y > 3 || x < -2|| y < -2 || YDistFromCam < 0)
+            if (x > 4 || y > 4 || x < -3|| y < -3 || YDistFromCam < 0)
             {
                 return new PointF(-1, -1);
             }

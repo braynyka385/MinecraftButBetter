@@ -22,12 +22,12 @@ namespace MinecraftButBetter.Screens
         //List<Block> blocks = new List<Block>();
         bool[] pressedKeys = new bool[6];
         //Ray ray;
-        World world = new World(8, 10);
+        World world = new World(6, 12);
         public GameScreen()
         {
             random = new Random();
             InitializeComponent();
-            camera = new Camera(0, 3, 0, 90, 90, 0, 0);
+            camera = new Camera(0, 10, 0, 90, 90, 0, 0);
             world.generateChunks(camera.pos());
             gameTimer.Start();
         }
@@ -147,37 +147,12 @@ namespace MinecraftButBetter.Screens
                                     multiplierToCoords(midpoints[3])
 
                                 };
-                                g.FillPolygon(b.faceTextureBrush[j, fill[i, 0], fill[i, 1]], converted);
+                                if (converted[0].X > -10000 && converted[1].X > -10000 && converted[2].X > -10000 && converted[3].X > -10000)
+                                {
+                                    g.FillPolygon(b.faceTextureBrush[j, fill[i, 0], fill[i, 1]], converted);
+                                }
                             }
 
-                            //int[,] fill = new int[4, 2]
-                            //{
-                            //    {0,0},
-                            //    {1,0},
-                            //    {0,1},
-                            //    {1,1},
-                            //};
-                            //for (int i = 0; i < 4; i++)
-                            //{
-
-                            //    //This only works well if the face appears to be a square... fix
-                            //    PointF[] midpoints =
-                            //    {
-                            //        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[0]]),
-                            //        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[1]]),
-                            //        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[2]]),
-                            //        calculateMidpoint(pointsFs[corners[i]], pointsFs[corners[3]])
-                            //    };
-                            //    Point[] converted =
-                            //{
-                            //    multiplierToCoords(midpoints[0]),
-                            //    multiplierToCoords(midpoints[1]),
-                            //    multiplierToCoords(midpoints[2]),
-                            //    multiplierToCoords(midpoints[3])
-
-                            //};
-                            //    g.FillPolygon(b.faceTextureBrush[j, fill[i, 0], fill[i, 1]], converted);
-                            //}
                         }
                     }
                 }
@@ -248,7 +223,7 @@ namespace MinecraftButBetter.Screens
         }
         private void gameTimer_Tick(object sender, EventArgs e)
         {
-            double movementScale = 2;
+            double movementScale = 10;
             double z = (pressedKeys[0] == true ? movementScale * (gameTimer.Interval / 1000d) : 0)
                 - (pressedKeys[1] == true ? movementScale * (gameTimer.Interval / 1000d) : 0);
             double x = (pressedKeys[2] == true ? movementScale * (gameTimer.Interval / 1000d) : 0)
@@ -257,7 +232,7 @@ namespace MinecraftButBetter.Screens
                 - (pressedKeys[5] == true ? movementScale * (gameTimer.Interval / 1000d) : 0);
 
             camera.move(new PointD3(x, y, z));
-
+            world.generateChunks(camera.pos());
             foreach (Chunk c in world.loadChunks(camera.pos()))
             {
                 foreach (Block b in c.blocks)
@@ -336,7 +311,7 @@ namespace MinecraftButBetter.Screens
                     {
                         Block clicked = blocks[j];
                         PointD3 newPos = clicked.points[0].added(delta);
-                        Block newBlock = new BlockStone((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
+                        Block newBlock = new BlockCobblestone((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
 
                         world.addBlock(newBlock);
                     }
