@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using SimplexNoise;
 namespace MinecraftButBetter.WorldStuff
 {
     class Chunk
@@ -15,6 +15,7 @@ namespace MinecraftButBetter.WorldStuff
         public List<Block> blocks = new List<Block>();
         public readonly int X, Z;
         public double distFromPlayerSq;
+        public bool isModified = false;
         public Chunk(List<Block> blocks, int x, int z)
         {
             this.blocks = blocks;
@@ -108,6 +109,33 @@ namespace MinecraftButBetter.WorldStuff
                         
                     }
                     break;
+                case GeneratorType.Simplex:
+                    for (int x = 0; x < chunkSize; x++)
+                    {
+                        for (int z = 0; z < chunkSize; z++)
+                        {
+                            int f = (int)Math.Floor(Noise.CalcPixel2D(x +X,z+Z, 0.05f) / 24);
+                            f++;
+                            for (int y = 0; y < f; y++)
+                            {
+                                Block b;
+                                if (y == f - 1)
+                                {
+                                    b = new BlockGrass(x + X, y, z + Z);
+
+                                }
+                                else
+                                {
+                                    b = new BlockStone(x + X, y, z + Z);
+                                }
+                                blocks.Add(b);
+                            }
+                            
+                        }
+                        
+
+                    }
+                    break;
             }
         }
     }
@@ -115,7 +143,7 @@ namespace MinecraftButBetter.WorldStuff
     enum GeneratorType
     {
         Random,
-        Perlin,
+        Simplex,
         Flat
     }
 }

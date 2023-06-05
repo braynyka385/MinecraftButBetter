@@ -4,18 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SimplexNoise;
+using System.ComponentModel;
 
 namespace MinecraftButBetter.WorldStuff
 {
     class World
     {
+        
         List<Chunk> loadedChunks = new List<Chunk>();
         List<Chunk> unloadedChunks = new List<Chunk>();
         List<int[]> chunkPositions = new List<int[]>();
         int renderDistanceSquared;
         int renderDist;
-        public World(int chunkSize, int renderDistance)
+        public World(int chunkSize, int renderDistance, int seed)
         {
+            Noise.Seed = seed;
             this.renderDistanceSquared = renderDistance * renderDistance;
             renderDist = renderDistance;
             Chunk.chunkSize = chunkSize;
@@ -44,7 +48,27 @@ namespace MinecraftButBetter.WorldStuff
                 loadedChunks[i].distFromPlayerSq = dSq;
                 if (dSq < 0)
                 {
-                    unloadedChunks.Add(loadedChunks[i]);
+                    if (loadedChunks[i].isModified) //temp override  || true==true
+                    {
+                        unloadedChunks.Add(loadedChunks[i]);
+
+                    }
+
+                    else
+                    {
+                        int[] pos = new int[]
+                        {
+                            loadedChunks[i].X,  loadedChunks[i].Z
+                        };
+                        for (int cp = chunkPositions.Count - 1; cp >= 0; cp--)
+                        {
+                            if (chunkPositions[cp][0] == pos[0] && chunkPositions[cp][1] == pos[1])
+                            {
+                                chunkPositions.RemoveAt(cp);
+                            }
+                        }
+
+                    }
                     loadedChunks.RemoveAt(i);
                 }
 
@@ -55,10 +79,11 @@ namespace MinecraftButBetter.WorldStuff
         }
         public void generateChunks(PointD3 player)
         {
+            const int mult = 3;
             Point roundedPlayerPos = new Point((int)Math.Round(player.X / Chunk.chunkSize) * Chunk.chunkSize, (int)Math.Round(player.Z / Chunk.chunkSize) * Chunk.chunkSize);
-            for(int x = -renderDist * Chunk.chunkSize; x <= renderDist * Chunk.chunkSize; x += Chunk.chunkSize)
+            for(int x = -renderDist * Chunk.chunkSize + Chunk.chunkSize* mult; x <= renderDist * Chunk.chunkSize - Chunk.chunkSize * mult; x += Chunk.chunkSize)
             {
-                for (int z = -renderDist * Chunk.chunkSize; z <= renderDist * Chunk.chunkSize; z += Chunk.chunkSize)
+                for (int z = -renderDist * Chunk.chunkSize + Chunk.chunkSize * mult; z <= renderDist * Chunk.chunkSize - Chunk.chunkSize * mult; z += Chunk.chunkSize)
                 {
                     int[] pos = new int[]
                     {
@@ -76,25 +101,24 @@ namespace MinecraftButBetter.WorldStuff
                     {
                         int cg = 0;
                         chunkPositions.Add(new int[] { x + roundedPlayerPos.X, z + roundedPlayerPos.Y });
-                        Chunk c = new Chunk(GeneratorType.Flat, x + roundedPlayerPos.X, z + roundedPlayerPos.Y);
+                        Chunk c = new Chunk(GeneratorType.Simplex, x + roundedPlayerPos.X, z + roundedPlayerPos.Y);
                         c.optimizeChunk();
-                        unloadedChunks.Add(c);
+                        loadedChunks.Add(c);
                     }
                 }
             }
-
         }
         public void optimizeChunks()
         {
             foreach (Chunk c in loadedChunks)
             {
                 c.optimizeChunk();
-
             }
         }
         public void removeBlock(int chunkIndex, int blockIndex)
         {
             loadedChunks[chunkIndex].blocks.RemoveAt(blockIndex);
+            loadedChunks[chunkIndex].isModified = true;
             loadedChunks[chunkIndex].optimizeChunk();
         }
         public void addBlock(Block block)
@@ -111,6 +135,7 @@ namespace MinecraftButBetter.WorldStuff
                 if (loadedChunks[i].contains(block.points[0]))
                 {
                     loadedChunks[i].blocks.Add(block);
+                    loadedChunks[i].isModified = true;
                     return;
                 }
             }
@@ -124,21 +149,10 @@ namespace MinecraftButBetter.WorldStuff
             double d2 = (to.X - (c.X + chunkSize)) * (to.X - (c.X + chunkSize)) + (to.Z - c.Z) * (to.Z - c.Z);
             double d3 = (to.X - c.X) * (to.X - c.X) + (to.Z - (c.Z + chunkSize)) * (to.Z - (c.Z + chunkSize));
             double d4 = (to.X - (c.X + chunkSize)) * (to.X - (c.X + chunkSize)) + (to.Z - (c.Z + chunkSize)) * (to.Z - (c.Z + chunkSize));
-            //if(d2 < distSq)
-            //{
-            //    distSq = d2;
-            //}
-            //if(d3 < distSq)
-            //{
-            //    distSq = d3;
-            //}
-            //if(d4 < distSq)
-            //{
-            //    distSq = d4;
-            //}
+
 
             double finalDistTimesFour = (distSq + d2 + d3 + d4);
-            if (distSq < renderDistanceSquared * Chunk.chunkSize)
+            if (distSq < renderDistanceSquared * Chunk.chunkSize*Chunk.chunkSize)
             {
                 return finalDistTimesFour;
             }

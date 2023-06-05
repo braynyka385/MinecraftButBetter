@@ -22,12 +22,12 @@ namespace MinecraftButBetter.Screens
         //List<Block> blocks = new List<Block>();
         bool[] pressedKeys = new bool[6];
         //Ray ray;
-        World world = new World(6, 12);
+        World world = new World(6, 8, 100000);
         public GameScreen()
         {
             random = new Random();
             InitializeComponent();
-            camera = new Camera(0, 10, 0, 90, 90, 0, 0);
+            camera = new Camera(0, 20, 0, 90, 90, 0, 0);
             world.generateChunks(camera.pos());
             gameTimer.Start();
         }
@@ -223,7 +223,10 @@ namespace MinecraftButBetter.Screens
         }
         private void gameTimer_Tick(object sender, EventArgs e)
         {
-            double movementScale = 10;
+
+            double movementScale = 12;
+            double lastX = camera.pos().X;
+            double lastZ = camera.pos().Z;
             double z = (pressedKeys[0] == true ? movementScale * (gameTimer.Interval / 1000d) : 0)
                 - (pressedKeys[1] == true ? movementScale * (gameTimer.Interval / 1000d) : 0);
             double x = (pressedKeys[2] == true ? movementScale * (gameTimer.Interval / 1000d) : 0)
@@ -232,7 +235,12 @@ namespace MinecraftButBetter.Screens
                 - (pressedKeys[5] == true ? movementScale * (gameTimer.Interval / 1000d) : 0);
 
             camera.move(new PointD3(x, y, z));
-            world.generateChunks(camera.pos());
+            if (lastX != camera.pos().X || lastZ != camera.pos().Z)
+            {
+                world.generateChunks(camera.pos());
+            }
+
+            //world.generateChunks(camera.pos());
             foreach (Chunk c in world.loadChunks(camera.pos()))
             {
                 foreach (Block b in c.blocks)
@@ -246,7 +254,7 @@ namespace MinecraftButBetter.Screens
 
             }
 
-
+            
             Refresh();
         }
 
@@ -317,7 +325,8 @@ namespace MinecraftButBetter.Screens
                     }
                     
                 }
-                world.optimizeChunks();
+                world.getLoadedChunks()[cI[j]].optimizeChunk();
+                //world.optimizeChunks();
             }
 
         }
