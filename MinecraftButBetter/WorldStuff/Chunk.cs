@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SimplexNoise;
+using MinecraftButBetter.WorldStuff.Structures;
+
 namespace MinecraftButBetter.WorldStuff
 {
     class Chunk
@@ -13,6 +15,7 @@ namespace MinecraftButBetter.WorldStuff
         Random random = new Random();
         public static int chunkSize;
         public List<Block> blocks = new List<Block>();
+        public List<Structure> structures = new List<Structure>();
         public readonly int X, Z;
         public double distFromPlayerSq;
         public bool isModified = false;
@@ -129,6 +132,12 @@ namespace MinecraftButBetter.WorldStuff
                                     b = new BlockStone(x + X, y, z + Z);
                                 }
                                 blocks.Add(b);
+
+                                if(y == f-1 && Random.Shared.Next(0,100) == 5)
+                                {
+                                    Structure tree = new StructureTree(x + X, y + 1, z + Z);
+                                    structures.Add(tree);
+                                }
                             }
                             
                         }
@@ -136,6 +145,23 @@ namespace MinecraftButBetter.WorldStuff
 
                     }
                     break;
+            }
+            foreach (Structure structure in structures)
+            {
+                foreach (Block b in structure.GetBlocks())
+                {
+                    if (this.contains(b.points[0]))
+                    {
+                        blocks.Add(b);
+                    }
+                    else
+                    {
+                        //World.world.addBlock(b);
+                        blocks.Add(b); //TODO: Make this not suck
+                        //Blocks for structures will currently be in the wrong chunk if they are generated near the chunk border.
+
+                    }
+                }
             }
         }
     }

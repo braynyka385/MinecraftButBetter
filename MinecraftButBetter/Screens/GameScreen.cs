@@ -27,7 +27,7 @@ namespace MinecraftButBetter.Screens
         {
             random = new Random();
             InitializeComponent();
-            camera = new Camera(0, 20, 0, 90, 90, 0, 0);
+            camera = new Camera(0, 12, 0, 90, 90, 0, 0);
             world.generateChunks(camera.pos());
             gameTimer.Start();
         }
@@ -319,7 +319,7 @@ namespace MinecraftButBetter.Screens
                     {
                         Block clicked = blocks[j];
                         PointD3 newPos = clicked.points[0].added(delta);
-                        Block newBlock = new BlockCobblestone((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
+                        Block newBlock = new BlockLeaf((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
 
                         world.addBlock(newBlock);
                     }

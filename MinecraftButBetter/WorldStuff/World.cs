@@ -11,7 +11,7 @@ namespace MinecraftButBetter.WorldStuff
 {
     class World
     {
-        
+        public static World world;
         List<Chunk> loadedChunks = new List<Chunk>();
         List<Chunk> unloadedChunks = new List<Chunk>();
         List<int[]> chunkPositions = new List<int[]>();
@@ -23,6 +23,7 @@ namespace MinecraftButBetter.WorldStuff
             this.renderDistanceSquared = renderDistance * renderDistance;
             renderDist = renderDistance;
             Chunk.chunkSize = chunkSize;
+            world = this;
         }
         public List<Chunk> getLoadedChunks() { return loadedChunks; }
         public List<Chunk> loadChunks(PointD3 playerPos)
@@ -85,6 +86,15 @@ namespace MinecraftButBetter.WorldStuff
             {
                 for (int z = -renderDist * Chunk.chunkSize + Chunk.chunkSize * mult; z <= renderDist * Chunk.chunkSize - Chunk.chunkSize * mult; z += Chunk.chunkSize)
                 {
+                    //double dSq = chunkDistance(playerPos, new Chunk(GeneratorType.Flat, x + roundedPlayerPos.X, z + roundedPlayerPos.Y));//
+                    //unloadedChunks[i].distFromPlayerSq = dSq;
+                    //if (dSq > 0)
+                    //{
+                    //    loadedChunks.Add(unloadedChunks[i]);
+                    //    unloadedChunks.RemoveAt(i);
+                    //}
+
+                    //TODO: make chunk gen work with the same distance function as the loader, rather than being a square (or vice-versa)
                     int[] pos = new int[]
                     {
                          x + roundedPlayerPos.X, z + roundedPlayerPos.Y
@@ -140,7 +150,7 @@ namespace MinecraftButBetter.WorldStuff
                 }
             }
 
-            throw new Exception();
+           // throw new Exception();
         }
         double chunkDistance(PointD3 to, Chunk c)
         {
