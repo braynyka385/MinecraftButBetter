@@ -41,7 +41,7 @@ namespace MinecraftButBetter.Rendering
         {
          
             headingX = map(toX, 0, w, 360, 0);
-            headingY = map(toY, 0, h, 0, 180);
+            headingY = map(toY, 0, h, 20, 160);
             
         }
         public PointF pointToScreen(PointD3 point)

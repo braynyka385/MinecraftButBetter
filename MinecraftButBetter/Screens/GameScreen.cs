@@ -319,7 +319,7 @@ namespace MinecraftButBetter.Screens
                     {
                         Block clicked = blocks[j];
                         PointD3 newPos = clicked.points[0].added(delta);
-                        Block newBlock = new BlockLeaf((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
+                        Block newBlock = new BlockCobblestone((int)newPos.X, (int)newPos.Y, (int)newPos.Z);
 
                         world.addBlock(newBlock);
                     }
