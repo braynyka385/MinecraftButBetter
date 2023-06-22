@@ -33,6 +33,7 @@ namespace MinecraftButBetter.Screens
         }
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
+            this.BackColor = Color.DeepSkyBlue;
             foreach (Chunk c in world.getLoadedChunks())
             {
                 foreach (Block b in c.blocks)
